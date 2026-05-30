@@ -33,11 +33,39 @@ Sit on your chair. Collect glowing orbs to grow. Press **G** near a seated playe
 
 ---
 
+### Phase 0 — Standards & Infrastructure
+> Set the rules before writing a single line of new code. Every system built after this phase must comply with these standards.
+
+#### 🖥️ Server Size
+- [ ] **Max players: 12** — optimal balance of chaos, physics load, and network sync. Drop to 10 if performance testing reveals issues. Never exceed 16.
+- [ ] Set `MaxPlayers = 12` in the game settings before any team testing
+
+#### 🎯 Performance Standards *(all new systems must meet these)*
+- [ ] **FPS targets** — 60fps on mid-range PC, 30fps on mid-range mobile (e.g. iPhone 11 / mid-tier Android); define before building UI or VFX
+- [ ] **Heartbeat throttle rule** — every new RunService connection must be throttled; no system may run faster than 20fps on the server; document the tick rate for each system
+- [ ] **Remote event budget** — max 3 RemoteEvents firing per player per second under normal gameplay; all new events must be justified against this budget; consolidate where possible
+- [ ] **DataStore write strategy** — writes are debounced (save on leave + every 5 min, never on every event); a write queue handles retries on failure; no raw `SetAsync` without pcall + retry logic
+- [ ] **Part count budget** — max 500 active parts in Workspace during a live round (chairs + orbs + map + characters); each map must be verified against this before shipping
+- [ ] **Memory cleanup contract** — every system that creates connections, parts, or GUI elements must have a corresponding cleanup function; cleanup is called on player leave, round end, and map change
+
+#### 🧪 Testing Standards *(every phase must pass these before moving on)*
+- [ ] **Phase completion criteria** — each phase has a written pass/fail checklist; a phase is not "done" until all items pass in a team test
+- [ ] **Test progression order** — solo → 2-player → 6-player → 12-player (full server); never skip stages
+- [ ] **Regression rule** — when a new phase is added, re-run the previous phase's test checklist to confirm nothing broke
+- [ ] **Save before every team test** — File → Save to Roblox; scripts wipe on team test without this 📝
+
+#### 🔧 Dev Workflow
+- [ ] All scripts saved to GitHub after each major session (copy/paste from Studio)
+- [ ] README checked off as features ship
+- [ ] Bugs logged as GitHub Issues with reproduction steps
+
+---
+
 ### Phase 1 — Lock the Core Loop
 > Make existing mechanics feel intentional and bug-free before building on them.
 
 - [ ] Finalize tunables (orb growth, magnet range, boost drain) through playtesting
-- [ ] Define a hard size ceiling to prevent unbounded growth
+- [ ] Define a hard size ceiling to prevent unbounded growth (also a physics budget concern — see Phase 0)
 - [ ] Decide push trade-off: does pusher inherit full size, half, or capped amount?
 - [ ] Test edge cases: push during boost, simultaneous pushes, pushed at size 1
 
@@ -134,6 +162,7 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 - Evenly distributed spawn points across the map
 - Orb spawn zones defined per map (no orbs in dead corners)
 - All maps support all three game modes
+- Part count verified against Phase 0 budget (≤500 total active parts) before shipping
 
 ---
 
@@ -202,7 +231,7 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 - [ ] **Top-right leaderboard panel** — shows top 4 players with avatar thumbnail, username, and size/score
 - [ ] **Expand button** — arrow or toggle to see full server leaderboard
 - [ ] **Your row highlighted** — if you're outside top 4, your row is pinned and highlighted at the bottom
-- [ ] **Real-time updates** — refreshes every second during active rounds
+- [ ] **Real-time updates** — event-driven, not loop-driven; fires on size change only, throttled to max 2fps to protect performance
 - [ ] **Mode-aware display** — shows size in FFA, lives remaining in Survival, team scores in Team Mode
 
 #### 🛍️ Shop
@@ -223,12 +252,12 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 #### 📅 Daily Gift
 - [ ] **Daily button** — bottom-left with red notification badge when unclaimed
 - [ ] **Floating gift icon** — animated gift floats on screen at session start when daily is ready to claim
-- [ ] **"CLAIM!" button** — prominent top-center button when daily reward is available (inspired by reference image)
+- [ ] **"CLAIM!" button** — prominent top-center button when daily reward is available
 - [ ] **Login streak calendar** — shows the current streak and upcoming rewards for each consecutive day
 - [ ] **Claim animation** — coins/items burst out with satisfying sound on claim
 
 #### ⚡ In-Game Power-Up Buttons
-- [ ] **Bottom-center action bar** — 3 large buttons visible during active rounds (matches reference layout)
+- [ ] **Bottom-center action bar** — 3 large buttons visible during active rounds
 - [ ] **Push All** — instantly ragdolls all players within a radius off their chairs; cooldown or coin cost; big satisfying VFX
 - [ ] **2x Speed** — temporary 2× movement speed boost for a short duration; cooldown-based
 - [ ] **2x Size** — temporary size multiplier for a short duration; cooldown or coin cost
@@ -245,7 +274,7 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 ### Phase 8 — Progression & Economy
 > Give players reasons to come back. This is where retention lives.
 
-- [ ] **DataStore setup** — coins, gems, unlocks, stats, level (build this early — hard to migrate later)
+- [ ] **DataStore setup** — coins, gems, unlocks, stats, level; write queue + pcall + retry on every save; debounced writes (see Phase 0 standards)
 - [ ] **Soft currency (coins)** — earned from placement, pushes, playtime, power-up use, mode-specific bonuses
 - [ ] **Premium currency (gems)** — earned slowly in-game or purchased; used for spins and premium shop items
 - [ ] **Player XP / level** — climbs with playtime, gates cosmetic unlocks, shown on profile
@@ -281,12 +310,85 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 > Don't get wrecked on day one.
 
 - [ ] **Server-side size validation** — client-side scaling = exploitable; validate growth server-side ⚠️
-- [ ] **Performance pass** — full server stress test (max players + max orbs + Heartbeat at 20fps + all UI active)
+- [ ] **Performance pass** — full 12-player server stress test (max orbs + all UI active + Push All triggered)
 - [ ] **Analytics** — session length, round completion rate, mode popularity, shop conversion, where players quit
 - [ ] **Onboarding** — 10-second tutorial / first-time tooltips (sit, collect, press G, how power-ups work)
-- [ ] **Mobile support** — all HUD buttons and power-up bar sized for touch input
+- [ ] **Mobile support** — all HUD buttons and power-up bar verified on actual iOS and Android devices
 - [ ] **Game page polish** — icon, thumbnail, description, trailer GIF showing Push All moment
 - [ ] 📝 Remember: **File → Save to Roblox before every team test** (scripts wipe on team test)
+
+---
+
+### Phase 12 — Performance & Testing (Final QA)
+> The comprehensive QA pass before public launch. Every item below must pass at 12 players before the game goes live.
+
+---
+
+#### ⚡ Performance Audit
+- [ ] **Heartbeat audit** — list every RunService connection in the codebase; verify each is throttled per Phase 0 standards; remove or consolidate any unthrottled loops
+- [ ] **Remote event audit** — log all RemoteEvents/RemoteFunctions; verify total firing rate is within Phase 0 budget at 12 players; merge redundant events
+- [ ] **DataStore audit** — verify all saves go through the write queue; simulate 12 players finishing a round simultaneously and confirm no data loss or rate-limit errors
+- [ ] **Memory leak audit** — join → play a full round → leave; run Roblox's MicroProfiler and confirm no growing memory usage over 5 consecutive rounds
+- [ ] **Ragdoll cleanup verification** — trigger ragdoll on all 12 players simultaneously; verify all BallSocketConstraints are destroyed when ragdoll ends; check for orphaned constraints on player leave
+- [ ] **UI refresh rate verification** — confirm leaderboard and HUD updates are event-driven or throttled; verify no UI element is connected to an unthrottled RunService loop
+- [ ] **Chair physics budget** — test at max chair size with 12 players in Survival (worst-case collision load); verify server FPS stays above 20
+- [ ] **Part count verification** — run each map at 12 players and count active Workspace parts; must stay under Phase 0 budget of 500
+
+---
+
+#### 🧪 Functional Testing
+
+**Solo tests (1 player):**
+- [ ] Game starts alone without crashing or getting stuck in lobby
+- [ ] Can collect orbs, grow chair, boost, use power-ups alone
+- [ ] Round completes and returns to lobby without errors
+
+**2-player tests:**
+- [ ] Push mechanic syncs correctly — victim ragdolls on both clients simultaneously
+- [ ] Size transfer is accurate — pusher receives correct size
+- [ ] Both players see the same leaderboard ranking
+- [ ] Boost drain visible to both players
+
+**Full server tests (12 players):**
+- [ ] All chairs spawn without overlap or collision issues at round start
+- [ ] Leaderboard stays accurate under rapid size changes
+- [ ] Push All triggers correctly and affects all players within radius
+- [ ] Round timer stays in sync across all 12 clients
+- [ ] Results screen shows correct winner
+
+**Edge case tests:**
+- [ ] **Player leaves while sitting** — chair cleans up, round continues
+- [ ] **Player leaves while ragdolled** — BallSocketConstraints cleaned up, no server error
+- [ ] **Player leaves as last alive in Survival** — round ends correctly, no infinite loop
+- [ ] **Player leaves during Countdown** — game starts correctly with remaining players
+- [ ] **Player joins mid-round** — enters spectator correctly, no chair spawned mid-round
+- [ ] **0 players vote in lobby** — random map + mode selected, game starts
+- [ ] **All players on same team** — Team Mode handles degenerate case without crash
+- [ ] **Two players push each other simultaneously** — no duplicate ragdoll, no size duplication
+- [ ] **Two players collect the same orb at the same frame** — no double-growth exploit
+- [ ] **Push All fires while target is already ragdolled** — no error, no duplicate constraint
+
+**Mode transition tests:**
+- [ ] FFA → Survival → Team Mode → FFA: full cycle without state bleed between rounds
+- [ ] State machine cannot get stuck: test every transition manually (Lobby→Voting, Voting→Countdown, Countdown→Active, Active→Results, Results→Lobby)
+- [ ] Map transition: 12 players teleport from lobby to map simultaneously with no race conditions
+
+**DataStore failure test:**
+- [ ] Simulate DataStore unavailability (or test in Studio where DS may be limited) — game must degrade gracefully (warn player, don't crash, retry on next save interval)
+
+**Mobile device test:**
+- [ ] Test on actual iOS device — all HUD buttons tappable, FPS stays at or above 30
+- [ ] Test on actual Android device — power-up bar, shop, spin, daily all functional
+- [ ] On-screen controls don't overlap or obstruct gameplay view
+
+---
+
+#### 🔒 Security & Exploiter Audit
+- [ ] **Size inflation test** — fire a RemoteEvent manually to attempt fake size growth; server-side validation must reject it
+- [ ] **Push spoofing test** — attempt to trigger push on yourself or non-adjacent players via remote; server must validate proximity and eligibility
+- [ ] **Power-up spam test** — attempt to fire Push All without cooldown via remote; server must enforce cooldown independently
+- [ ] **DataStore injection test** — attempt to write arbitrary data via client-side exploit; server must only accept whitelisted values
+- [ ] **Coin duplication test** — attempt to trigger multiple coin rewards for a single event; server must be authoritative on all economy transactions
 
 ---
 
@@ -308,25 +410,30 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 - **Server never calls `ScaleTo` during gameplay** — fixes the HipHeight unseating bug at size 1.45
 - **`Occupied` attribute** updated every Heartbeat (not event-based) to survive brief SeatWeld disruptions
 - **Survival mode collision ⚠️** — current Chairs collision group (chairs phase through each other) must be changed for Survival; chairs need to physically interact with each other in that mode
+- **Max server size: 12 players** — physics, sync, and DataStore load all tuned to this cap
 
 ---
 
 ## 🔢 Suggested Build Order
 
-1. **Phase 1** → lock the core loop feel
-2. **Phase 2** → lobby + voting → proper start/end flow
-3. **Phase 3 + 4** → FFA mode first, then round structure → playable game
-4. **Phase 6** → juice it → feels good
-5. **Phase 5** → add maps + wire up map voting → variety
-6. **Phase 7** → full UI layer: HUD, shop, spin, daily, power-ups → looks and feels like a real game
-7. **Phase 3 cont.** → add Survival + Team modes once FFA is solid
-8. **Phase 8** → progression + DataStore → people come back
-9. **Phase 11** (anti-cheat + analytics) → pull these forward before any public release
-10. **Phase 9 + 10** → monetization, social → growth and revenue
+1. **Phase 0** → set standards, server size, dev workflow — do this before touching any code
+2. **Phase 1** → lock the core loop feel
+3. **Phase 2** → lobby + voting → proper start/end flow
+4. **Phase 3 + 4** → FFA mode first, then round structure → playable game
+5. **Phase 6** → juice it → feels good
+6. **Phase 5** → add maps + wire up map voting → variety
+7. **Phase 7** → full UI layer: HUD, shop, spin, daily, power-ups → looks like a real game
+8. **Phase 3 cont.** → add Survival + Team modes once FFA is solid
+9. **Phase 8** → progression + DataStore → people come back
+10. **Phase 11** (anti-cheat + analytics) → pull these forward before any public release
+11. **Phase 9 + 10** → monetization, social → growth and revenue
+12. **Phase 12** → full QA pass → ship it
 
-> ⚠️ Build DataStore (Phase 8) and server-side validation (Phase 11) earlier than their phase number suggests. Both are foundational and very painful to retrofit later.
+> ⚠️ Build DataStore (Phase 8) and server-side validation (Phase 11) earlier than their phase number suggests — both are foundational and painful to retrofit.
 >
 > ⚠️ The Survival mode chair collision fix is a significant architecture change — plan it before any other Survival work begins.
+>
+> ⚠️ Phase 12 is not optional — every item in the exploiter audit must pass before going public.
 
 ---
 
