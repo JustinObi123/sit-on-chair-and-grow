@@ -174,59 +174,118 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 ### Phase 6 — Game Feel & Juice
 > Make actions feel satisfying. This is what separates good Roblox games from great ones.
 
-- [ ] **HUD:** current size, round timer, live rank, orb count, current mode indicator
 - [ ] **Push feedback:** screen shake, impact VFX, sound on successful push, "Knocked off!" callout
 - [ ] **Orb collection:** pop/sparkle on pickup, size-up flash, satisfying sound
 - [ ] **Growth visuals:** glow that intensifies with size, trail that scales with chair
-- [ ] **Boost feedback:** speed lines, trail VFX, audible whoosh, boost meter in HUD
+- [ ] **Boost feedback:** speed lines, trail VFX, audible whoosh, boost meter on screen
 - [ ] **Camera:** smooth zoom-out as chair grows, large chairs stay framed
 - [ ] **Music:** lobby loop, intermission sting, per-mode active round music, round-end sting
 - [ ] **Announcer text:** "New leader!", "10 seconds left!", "[Player] has been eliminated!", "Teams are tied!"
+- [ ] **Round transition animations:** fade in/out, results screen slide-in, trophy animation for winner
 
 ---
 
-### Phase 7 — Progression & Economy
+### Phase 7 — In-Game UI, Shop & Power-Ups
+> The full UI layer players interact with every session — HUD, economy displays, shop, spin, daily rewards, and in-game power-up buttons.
+
+---
+
+#### 💰 Currency & HUD Display
+- [ ] **Coin display** — top-left corner showing coin icon + formatted amount (e.g. "12.22K"); "+" button to open purchase screen
+- [ ] **Gem/premium currency display** — secondary currency shown alongside coins
+- [ ] **Animated coin counter** — numbers tick up when coins are earned mid-round
+- [ ] **Round timer** — prominent countdown visible during active rounds
+- [ ] **Current size indicator** — your live chair size displayed clearly on HUD
+- [ ] **Rank indicator** — your live placement during the round (e.g. "#2 of 8")
+
+#### 🏆 In-Game Leaderboard
+- [ ] **Top-right leaderboard panel** — shows top 4 players with avatar thumbnail, username, and size/score
+- [ ] **Expand button** — arrow or toggle to see full server leaderboard
+- [ ] **Your row highlighted** — if you're outside top 4, your row is pinned and highlighted at the bottom
+- [ ] **Real-time updates** — refreshes every second during active rounds
+- [ ] **Mode-aware display** — shows size in FFA, lives remaining in Survival, team scores in Team Mode
+
+#### 🛍️ Shop
+- [ ] **Shop button** — bottom-left corner with icon; opens full-screen shop overlay
+- [ ] **Chair skins tab** — browse, preview, and buy chair cosmetics (coin or Robux priced)
+- [ ] **Chair trails tab** — browse, preview, and buy trail effects
+- [ ] **Equipped indicator** — clear "Equipped" badge on currently active items
+- [ ] **Categories** — Free, Coins, Robux, Limited/Event
+- [ ] **Preview mode** — clicking a skin/trail previews it on your chair in real time before buying
+
+#### 🎰 Spin Wheel
+- [ ] **Spin button** — bottom-left area with notification badge when a free spin is available
+- [ ] **Animated spin wheel** — satisfying spin animation with coin, gem, and cosmetic prize slots
+- [ ] **Free spin timer** — e.g. 1 free spin every 4 hours; timer shown on button
+- [ ] **Multi-spin** — spend coins or Robux for extra spins in one session
+- [ ] **Prize reveal animation** — dramatic pop-up when landing on a rare item
+
+#### 📅 Daily Gift
+- [ ] **Daily button** — bottom-left with red notification badge when unclaimed
+- [ ] **Floating gift icon** — animated gift floats on screen at session start when daily is ready to claim
+- [ ] **"CLAIM!" button** — prominent top-center button when daily reward is available (inspired by reference image)
+- [ ] **Login streak calendar** — shows the current streak and upcoming rewards for each consecutive day
+- [ ] **Claim animation** — coins/items burst out with satisfying sound on claim
+
+#### ⚡ In-Game Power-Up Buttons
+- [ ] **Bottom-center action bar** — 3 large buttons visible during active rounds (matches reference layout)
+- [ ] **Push All** — instantly ragdolls all players within a radius off their chairs; cooldown or coin cost; big satisfying VFX
+- [ ] **2x Speed** — temporary 2× movement speed boost for a short duration; cooldown-based
+- [ ] **2x Size** — temporary size multiplier for a short duration; cooldown or coin cost
+- [ ] **Cooldown UI** — each button shows a visual cooldown ring/timer so players know when it's ready again
+- [ ] **Mobile-friendly** — buttons large enough to tap comfortably on phone screens
+
+#### 🎁 VIP & Event UI
+- [ ] **VIP zone** — special area on maps for VIP pass holders (visual indicator above VIP players' chairs)
+- [ ] **Event banners** — seasonal event announcements shown in lobby and on HUD
+- [ ] **Limited-time offer popups** — timed shop deals shown tastefully (not intrusive)
+
+---
+
+### Phase 8 — Progression & Economy
 > Give players reasons to come back. This is where retention lives.
 
-- [ ] **DataStore setup** — coins, unlocks, stats, level (build this early — hard to migrate later)
-- [ ] **Soft currency (coins)** — earned from placement, pushes, playtime, mode-specific bonuses
-- [ ] **Player XP / level** — climbs with playtime, gates cosmetic unlocks
+- [ ] **DataStore setup** — coins, gems, unlocks, stats, level (build this early — hard to migrate later)
+- [ ] **Soft currency (coins)** — earned from placement, pushes, playtime, power-up use, mode-specific bonuses
+- [ ] **Premium currency (gems)** — earned slowly in-game or purchased; used for spins and premium shop items
+- [ ] **Player XP / level** — climbs with playtime, gates cosmetic unlocks, shown on profile
 - [ ] **Daily login reward / streak** — highest ROI retention feature on Roblox
-- [ ] **Daily quests** — "push 10 players," "reach size 20," "win a Survival round"
-- [ ] **Stats page** — total wins per mode, biggest chair ever, players pushed, win rate
+- [ ] **Daily quests** — "push 10 players," "reach size 20," "win a Survival round," "use Push All 3 times"
+- [ ] **Stats page** — total wins per mode, biggest chair ever, players pushed, power-ups used, win rate
 
 ---
 
-### Phase 8 — Monetization
+### Phase 9 — Monetization
 > Revenue without breaking fairness. Cosmetics and convenience, not pay-to-win.
 
-- [ ] **Game Passes (permanent):** chair skins/trails, VIP tag, 2× coins multiplier, extra daily reward
-- [ ] **Developer Products (consumable):** coin packs, one-round head-start size, extra boost charges
-- [ ] **Roblox Premium Payouts:** give Premium members a perk to maximize engagement bonus
+- [ ] **Game Passes (permanent):** chair skin bundle, trail bundle, VIP zone access, 2× coins multiplier, extra daily spin
+- [ ] **Developer Products (consumable):** coin packs, gem packs, instant power-up charges, bonus spin bundle
+- [ ] **Robux shop items:** exclusive chair skins, exclusive trails, limited event cosmetics
+- [ ] **Roblox Premium Payouts:** give Premium members a daily gem bonus to maximize engagement revenue
 - [ ] ⚠️ Avoid anything that lets paying players permanently out-grow or become un-pushable
 
 ---
 
-### Phase 9 — Social & Competitive
+### Phase 10 — Social & Competitive
 > Make the game sticky and shareable.
 
-- [ ] **Global leaderboards** (DataStore-backed): biggest chair ever, most wins per mode, weekly resets
-- [ ] **In-round live leaderboard** showing current size or team scores
+- [ ] **Global leaderboards** (DataStore-backed): biggest chair ever, most wins per mode, most pushes, weekly resets
+- [ ] **In-round live leaderboard** showing current size or team scores (see Phase 7)
 - [ ] **Parties / friend join:** queue together, join friends' servers, see friends in lobby
 - [ ] **Roblox Badges:** first win, size 50 reached, 100 pushes, first Survival win — free virality
-- [ ] **Clip-worthy moments:** big push VFX dramatic enough to post/stream
+- [ ] **Clip-worthy moments:** Push All VFX and big push animations dramatic enough to post/stream
 
 ---
 
-### Phase 10 — Launch Readiness
+### Phase 11 — Launch Readiness
 > Don't get wrecked on day one.
 
 - [ ] **Server-side size validation** — client-side scaling = exploitable; validate growth server-side ⚠️
-- [ ] **Performance pass** — full server stress test (max players + max orbs + Heartbeat at 20fps)
-- [ ] **Analytics** — session length, round completion rate, mode popularity, where players quit, conversion
-- [ ] **Onboarding** — 10-second tutorial / first-time tooltips (sit, collect, press G, mode rules)
-- [ ] **Mobile support** — on-screen boost button + push button (Roblox is mobile-heavy)
-- [ ] **Game page polish** — icon, thumbnail, description, trailer GIF
+- [ ] **Performance pass** — full server stress test (max players + max orbs + Heartbeat at 20fps + all UI active)
+- [ ] **Analytics** — session length, round completion rate, mode popularity, shop conversion, where players quit
+- [ ] **Onboarding** — 10-second tutorial / first-time tooltips (sit, collect, press G, how power-ups work)
+- [ ] **Mobile support** — all HUD buttons and power-up bar sized for touch input
+- [ ] **Game page polish** — icon, thumbnail, description, trailer GIF showing Push All moment
 - [ ] 📝 Remember: **File → Save to Roblox before every team test** (scripts wipe on team test)
 
 ---
@@ -255,16 +314,17 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 ## 🔢 Suggested Build Order
 
 1. **Phase 1** → lock the core loop feel
-2. **Phase 2** → lobby + voting → now the game has a proper start/end flow
-3. **Phase 3 + 4** → FFA mode first (simplest), then round structure → now it's a playable game
-4. **Phase 6** → juice it → now it feels good
-5. **Phase 5** → add maps + wire up map voting → now there's variety
-6. **Phase 3 cont.** → add Survival + Team modes once FFA is solid
-7. **Phase 7** → progression + DataStore → now people come back
-8. **Phase 10** (anti-cheat + analytics) → pull these forward before any public release
-9. **Phase 8 + 9** → monetization, social → growth and revenue
+2. **Phase 2** → lobby + voting → proper start/end flow
+3. **Phase 3 + 4** → FFA mode first, then round structure → playable game
+4. **Phase 6** → juice it → feels good
+5. **Phase 5** → add maps + wire up map voting → variety
+6. **Phase 7** → full UI layer: HUD, shop, spin, daily, power-ups → looks and feels like a real game
+7. **Phase 3 cont.** → add Survival + Team modes once FFA is solid
+8. **Phase 8** → progression + DataStore → people come back
+9. **Phase 11** (anti-cheat + analytics) → pull these forward before any public release
+10. **Phase 9 + 10** → monetization, social → growth and revenue
 
-> ⚠️ Build DataStore (Phase 7) and server-side validation (Phase 10) earlier than their phase number suggests. Both are foundational and very painful to retrofit later.
+> ⚠️ Build DataStore (Phase 8) and server-side validation (Phase 11) earlier than their phase number suggests. Both are foundational and very painful to retrofit later.
 >
 > ⚠️ The Survival mode chair collision fix is a significant architecture change — plan it before any other Survival work begins.
 
