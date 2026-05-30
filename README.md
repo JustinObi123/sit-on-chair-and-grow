@@ -53,48 +53,151 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 
 ---
 
-### Phase 2 — Make It a Game (Rounds & Objectives)
-> Add the structure that turns the sandbox into a match.
+### Phase 2 — Lobby System & Map Voting
+> Pre-game flow that brings players together, lets them vote, and transitions cleanly into a match.
 
-**Win condition: Biggest chair at the buzzer** *(timed rounds, ~3–5 min)*
-
-- [ ] Server-authoritative round timer
-- [ ] Round state machine: `Intermission → Countdown → Active → Results → Repeat`
-- [ ] Win condition logic (largest chair when timer hits 0)
-- [ ] Round results screen (winner, top 3, your placement, size reached)
-- [ ] Per-round scoring (size reached, players pushed, time spent as #1)
-- [ ] Fresh chair at size 1 for every player each round
-- [ ] Spectator state for players who join mid-round
+- [ ] **Lobby area** — a dedicated waiting room/spawn zone separate from the game arena; players spawn here between rounds
+- [ ] **Player count threshold** — game only starts once a minimum number of players are ready (e.g. 2+)
+- [ ] **Map voting UI** — shows available maps with thumbnails/names and a live vote count; players click to vote
+- [ ] **Game mode voting UI** — players vote on which mode to play alongside the map vote
+- [ ] **Voting timer** — countdown visible to all; most-voted map + mode wins; ties broken randomly
+- [ ] **Intermission countdown** — after voting closes, a short "Match starting in 3…2…1" screen before teleport
+- [ ] **Auto-start fallback** — if player count threshold isn't met after a timeout, start anyway or loop intermission
+- [ ] **Upcoming match display** — lobby shows the winning map + mode to all players while countdown runs
 
 ---
 
-### Phase 3 — Game Feel & Juice
+### Phase 3 — Game Modes
+> Three core competitive formats. Each changes how winning is determined and how chairs interact.
+
+---
+
+#### 🏆 Mode 1: Timed Free-for-All *(default)*
+> Every player for themselves. Biggest chair when the 5-minute timer hits zero wins.
+
+- [ ] 5-minute server-authoritative round timer displayed on HUD
+- [ ] Live size leaderboard visible to all players during the round
+- [ ] Winner = player with the largest `TargetSize` when timer expires
+- [ ] Round results screen: winner, top 3, your final size and placement
+- [ ] Chairs phase through each other (current behaviour — no friendly collision needed)
+
+---
+
+#### ☠️ Mode 2: Survival
+> Last chair growing wins. Get pushed off too many times and you're eliminated.
+
+- [ ] **Lives system** — each player starts with a set number of lives (e.g. 3); losing your chair costs 1 life
+- [ ] **Elimination** — reach 0 lives → chair disappears, player enters spectator mode
+- [ ] **Chair collision fix ⚠️** — currently chairs phase through each other due to the Chairs collision group; Survival requires chairs to physically collide and push each other, not just the G-key mechanic. Needs a new collision setup (chairs collide with each other AND the floor, not just floor)
+- [ ] Win condition: last player with lives remaining
+- [ ] **Sudden death** — when only 2 players remain, orb spawn rate doubles and the arena shrinks (or a timer triggers forced confrontation)
+- [ ] **Lives indicator** — small chair icons above each player's head showing remaining lives
+- [ ] Spectator cam for eliminated players that follows remaining competitors
+
+---
+
+#### 👥 Mode 3: Team Mode
+> Teams compete. The team with the highest combined chair size at the end of 5 minutes wins.
+
+- [ ] Auto-team assignment on round start (teams balanced by player count)
+- [ ] Team color coding — chair color reflects team assignment (e.g. red vs blue)
+- [ ] **Team score display** — combined `TargetSize` of all living teammates shown live on HUD
+- [ ] Friendly fire rule — players cannot push teammates off (G-key blocked on same team)
+- [ ] Round results: winning team name, MVP (largest individual chair), all team scores
+- [ ] Team indicator above player heads (color tag or team icon)
+
+---
+
+#### 🔮 Future Modes *(ideas to flesh out later)*
+- [ ] TBD — more modes to be designed as the game grows
+
+---
+
+### Phase 4 — Round Structure & Scoring
+> The server-side skeleton that powers all three modes.
+
+- [ ] Round state machine: `Lobby → Voting → Countdown → Active → Results → Lobby`
+- [ ] Mode-aware win condition logic (FFA size check vs. survival elimination vs. team sum)
+- [ ] Per-round scoring tracked server-side: size reached, players pushed, time spent as #1
+- [ ] Fresh chair at size 1 for every player at round start
+- [ ] Clean teleport: lobby → map → lobby between rounds
+- [ ] Spectator state for late-joining players mid-round
+
+---
+
+### Phase 5 — Maps
+> All maps are flat. Variety comes from layout, theme, hazards, and edge design — not height.
+
+**Map Design Rules:**
+- Every map is a single flat plane — no ramps, no hills, no multi-level geometry
+- Boundary walls or kill-planes prevent chairs from drifting off permanently
+- Evenly distributed spawn points across the map
+- Orb spawn zones defined per map (no orbs in dead corners)
+- All maps support all three game modes
+
+---
+
+#### 🟩 Map 1: Grass Classic *(current)*
+- [ ] Polish the existing Baseplate: add boundary walls, defined spawn points, orb zones
+- [ ] Aesthetic pass: sky, lighting, simple decorative props around the edges
+
+#### 🌌 Map 2: Neon Void
+- [ ] Dark map with glowing floor tiles and a void border
+- [ ] High-contrast aesthetic — chairs and orbs pop visually against the dark background
+- [ ] Kill-plane border: fall off = instant chair reset
+
+#### 🏙️ Map 3: Grid City
+- [ ] Urban grid layout with low divider walls (chairs can ride along or around them)
+- [ ] Creates natural lanes and choke points without breaking the flat rule
+- [ ] Good for team mode — natural territory splitting
+
+#### 🧊 Map 4: Ice Rink
+- [ ] White/blue icy flat surface
+- [ ] Surface friction modifier: chairs drift and slide further after movement input
+- [ ] Pushes feel more chaotic and rewarding on this map
+
+#### ☁️ Map 5: Sky Platform
+- [ ] Floating platform in the sky, smaller than the standard map
+- [ ] All four edges are open — getting pushed near the edge is very high stakes
+- [ ] Good pairing with Survival mode
+
+#### ⬛ Map 6: Tiny Arena
+- [ ] Very small flat platform — forces constant confrontation
+- [ ] Designed for shorter, chaotic rounds
+- [ ] Works best with Survival mode
+
+#### 🔮 More Maps *(future)*
+- [ ] Additional maps to be designed and added as the game grows
+
+---
+
+### Phase 6 — Game Feel & Juice
 > Make actions feel satisfying. This is what separates good Roblox games from great ones.
 
-- [ ] **HUD:** current size, round timer, live rank, orb count
+- [ ] **HUD:** current size, round timer, live rank, orb count, current mode indicator
 - [ ] **Push feedback:** screen shake, impact VFX, sound on successful push, "Knocked off!" callout
 - [ ] **Orb collection:** pop/sparkle on pickup, size-up flash, satisfying sound
 - [ ] **Growth visuals:** glow that intensifies with size, trail that scales with chair
 - [ ] **Boost feedback:** speed lines, trail VFX, audible whoosh, boost meter in HUD
 - [ ] **Camera:** smooth zoom-out as chair grows, large chairs stay framed
-- [ ] **Music:** intermission loop vs. active round loop, sting on round end
-- [ ] **Announcer text:** "New leader!", "10 seconds left!", "[Player] is on a rampage!"
+- [ ] **Music:** lobby loop, intermission sting, per-mode active round music, round-end sting
+- [ ] **Announcer text:** "New leader!", "10 seconds left!", "[Player] has been eliminated!", "Teams are tied!"
 
 ---
 
-### Phase 4 — Progression & Economy
+### Phase 7 — Progression & Economy
 > Give players reasons to come back. This is where retention lives.
 
 - [ ] **DataStore setup** — coins, unlocks, stats, level (build this early — hard to migrate later)
-- [ ] **Soft currency (coins)** — earned from placement, pushes, playtime
-- [ ] **Player XP / level** — gates cosmetic unlocks
+- [ ] **Soft currency (coins)** — earned from placement, pushes, playtime, mode-specific bonuses
+- [ ] **Player XP / level** — climbs with playtime, gates cosmetic unlocks
 - [ ] **Daily login reward / streak** — highest ROI retention feature on Roblox
-- [ ] **Daily quests** — "push 10 players," "reach size 20," "win a round"
-- [ ] **Stats page** — total wins, biggest chair ever, players pushed, win rate
+- [ ] **Daily quests** — "push 10 players," "reach size 20," "win a Survival round"
+- [ ] **Stats page** — total wins per mode, biggest chair ever, players pushed, win rate
 
 ---
 
-### Phase 5 — Monetization
+### Phase 8 — Monetization
 > Revenue without breaking fairness. Cosmetics and convenience, not pay-to-win.
 
 - [ ] **Game Passes (permanent):** chair skins/trails, VIP tag, 2× coins multiplier, extra daily reward
@@ -104,36 +207,24 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 
 ---
 
-### Phase 6 — Content & Variety
-> Keep the game fresh past the first session.
-
-- [ ] Chair skins & trail cosmetics (neon, metal, rainbow, themed sets)
-- [ ] Multiple maps — vary size, obstacles, and hazards
-- [ ] Maps with ledges and pits that synergize with the push mechanic
-- [ ] Environmental hazards (conveyor belts, bumpers, bounce pads)
-- [ ] Power-up orbs (rare): push shield, magnet boost, speed burst
-- [ ] Special round modifiers: "Double Growth," "Low Gravity," "No Boost" — rotated
-
----
-
-### Phase 7 — Social & Competitive
+### Phase 9 — Social & Competitive
 > Make the game sticky and shareable.
 
-- [ ] **Global leaderboards** (DataStore-backed): biggest chair ever, most wins, weekly resets
-- [ ] **In-round live leaderboard** showing current size rankings
-- [ ] **Parties / friend join:** queue together, join friends' servers
-- [ ] **Roblox Badges:** first win, size 50 reached, 100 pushes — free virality
+- [ ] **Global leaderboards** (DataStore-backed): biggest chair ever, most wins per mode, weekly resets
+- [ ] **In-round live leaderboard** showing current size or team scores
+- [ ] **Parties / friend join:** queue together, join friends' servers, see friends in lobby
+- [ ] **Roblox Badges:** first win, size 50 reached, 100 pushes, first Survival win — free virality
 - [ ] **Clip-worthy moments:** big push VFX dramatic enough to post/stream
 
 ---
 
-### Phase 8 — Launch Readiness
+### Phase 10 — Launch Readiness
 > Don't get wrecked on day one.
 
 - [ ] **Server-side size validation** — client-side scaling = exploitable; validate growth server-side ⚠️
 - [ ] **Performance pass** — full server stress test (max players + max orbs + Heartbeat at 20fps)
-- [ ] **Analytics** — session length, round completion rate, where players quit, conversion
-- [ ] **Onboarding** — 10-second tutorial / first-time tooltips (sit, collect, press G)
+- [ ] **Analytics** — session length, round completion rate, mode popularity, where players quit, conversion
+- [ ] **Onboarding** — 10-second tutorial / first-time tooltips (sit, collect, press G, mode rules)
 - [ ] **Mobile support** — on-screen boost button + push button (Roblox is mobile-heavy)
 - [ ] **Game page polish** — icon, thumbnail, description, trailer GIF
 - [ ] 📝 Remember: **File → Save to Roblox before every team test** (scripts wipe on team test)
@@ -157,19 +248,25 @@ BOOST_DRAIN   = 0.15      BOOST_RATE    = 0.5
 - **Character scaling is client-side** — server sets `CharScale` on HRP, all clients apply `character:ScaleTo()`
 - **Server never calls `ScaleTo` during gameplay** — fixes the HipHeight unseating bug at size 1.45
 - **`Occupied` attribute** updated every Heartbeat (not event-based) to survive brief SeatWeld disruptions
+- **Survival mode collision ⚠️** — current Chairs collision group (chairs phase through each other) must be changed for Survival; chairs need to physically interact with each other in that mode
 
 ---
 
 ## 🔢 Suggested Build Order
 
-1. **Pick the win condition** *(recommend: biggest at the buzzer)*
-2. **Phase 1 + 2** → lock the loop, add rounds → now it's a game
-3. **Phase 3** → juice it → now it feels good
-4. **Phase 4** → progression + DataStore → now people come back
-5. **Phase 8** (anti-cheat + analytics) → pull these forward before any public release
-6. **Phase 5, 6, 7** → monetization, content, social → growth and revenue
+1. **Phase 1** → lock the core loop feel
+2. **Phase 2** → lobby + voting → now the game has a proper start/end flow
+3. **Phase 3 + 4** → FFA mode first (simplest), then round structure → now it's a playable game
+4. **Phase 6** → juice it → now it feels good
+5. **Phase 5** → add maps + wire up map voting → now there's variety
+6. **Phase 3 cont.** → add Survival + Team modes once FFA is solid
+7. **Phase 7** → progression + DataStore → now people come back
+8. **Phase 10** (anti-cheat + analytics) → pull these forward before any public release
+9. **Phase 8 + 9** → monetization, social → growth and revenue
 
-> ⚠️ Build DataStore (Phase 4) and server-side validation (Phase 8) earlier than their phase number suggests. Both are foundational and very painful to retrofit later.
+> ⚠️ Build DataStore (Phase 7) and server-side validation (Phase 10) earlier than their phase number suggests. Both are foundational and very painful to retrofit later.
+>
+> ⚠️ The Survival mode chair collision fix is a significant architecture change — plan it before any other Survival work begins.
 
 ---
 
