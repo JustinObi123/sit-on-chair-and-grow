@@ -26,7 +26,7 @@ Sit on your chair. Collect glowing orbs to grow. Press **G** near a seated playe
 - [x] Network ownership — granted to sitting player via `seat:SetNetworkOwner(p)`
 - [x] 1-second spawn protection on sit (blocks push and being pushed)
 - [x] Chair collision group — chairs phase through each other, collide with floor
-- [x] Flat 512×512 grass Baseplate map at Y=0
+- [x] Flat 600×600 grass Baseplate map at Y=0
 - [x] `Heartbeat` throttled to 20fps in ChairManager and OrbManager
 - [x] Hard size ceiling — `MAX_SIZE = 50` prevents unbounded growth
 - [x] Raycast Y-spring — chairs sit at the correct height on elevated maps, not just Y=0
@@ -531,4 +531,4 @@ BOOST_MIN     = 1.05       FLIP  = 0.1 / FTIME = 1.5  (flip-recovery)
 
 *Maintained alongside development. Check off features as they ship.*
 
-*Last synced with the Studio build: 2026-05-31 — checked off lobby + voting, round structure, Timed FFA, and Neon Void; corrected the tunables block (notably `ORB_COUNT` 20 → 1000) and flagged the part-count budget conflict, the deterministic vote tiebreak, the kill-plane teleport-vs-reset behavior, and the stubbed upcoming-match display.*
+*Last synced with the Studio build: 2026-05-31 — checked off lobby + voting, round structure, Timed FFA, and Neon Void; corrected the tunables block (notably `ORB_COUNT` 20 → 1000) and flagged the part-count budget conflict, the deterministic vote tiebreak, the kill-plane teleport-vs-reset behavior, and the stubbed upcoming-match display; resized the Grass Classic baseplate from 1500×1500 to 600×600 to sit close to the tree border.*
